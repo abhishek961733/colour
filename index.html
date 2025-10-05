@@ -1,65 +1,100 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Color Prediction</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            background-color: #f5f5f5;
-            padding: 50px;
-        }
-        h1 {
-            color: #333;
-        }
-        #colorBox {
-            width: 200px;
-            height: 200px;
-            margin: 20px auto;
-            border: 2px solid #333;
-            border-radius: 10px;
-            background-color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-        }
-        button {
-            padding: 10px 20px;
-            font-size: 16px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            background-color: #333;
-            color: #fff;
-        }
-        button:hover {
-            background-color: #555;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Color Prediction (All-in-One)</title>
+<style>
+body { font-family: Arial; text-align:center; padding:30px; background:#f5f5f5;}
+#colorBox { width:200px; height:200px; margin:20px auto; border:2px solid #333; display:flex; align-items:center; justify-content:center; font-weight:bold; border-radius:10px; background:#fff;}
+button { padding:10px 20px; margin:5px; cursor:pointer; border:none; border-radius:5px; background:#333; color:#fff;}
+button:hover { background:#555;}
+input { padding:10px; margin:5px; border-radius:5px; border:1px solid #ccc;}
+#history { margin-top:20px; }
+</style>
 </head>
 <body>
 
-    <h1>Color Prediction</h1>
-    <div id="colorBox">Click Predict</div>
-    <button onclick="predictColor()">Predict Color</button>
+<h1>Color Prediction</h1>
 
-    <script>
-        const colors = [
-            "Red", "Blue", "Green", "Yellow", "Orange", 
-            "Purple", "Pink", "Brown", "Black", "White"
-        ];
+<input type="text" id="username" placeholder="Enter your name" />
+<div id="balance">Balance: 0</div>
 
-        function predictColor() {
-            const randomIndex = Math.floor(Math.random() * colors.length);
-            const color = colors[randomIndex];
-            const colorBox = document.getElementById("colorBox");
-            colorBox.style.backgroundColor = color.toLowerCase();
-            colorBox.innerText = color;
-        }
-    </script>
+<div class="actions">
+    <input type="number" id="amount" placeholder="Amount" />
+    <button onclick="deposit()">Deposit</button>
+    <button onclick="withdraw()">Withdraw</button>
+</div>
+
+<div id="colorBox">Click Predict</div>
+<button onclick="predict()">Predict Color</button>
+
+<div id="history"></div>
+
+<script>
+function getUserData(user) {
+    let data = JSON.parse(localStorage.getItem('colorUsers') || '{}');
+    if(!data[user]) {
+        data[user] = { balance: 0, history: [] };
+        localStorage.setItem('colorUsers', JSON.stringify(data));
+    }
+    return data[user];
+}
+
+function saveUserData(user, userData) {
+    let data = JSON.parse(localStorage.getItem('colorUsers') || '{}');
+    data[user] = userData;
+    localStorage.setItem('colorUsers', JSON.stringify(data));
+}
+
+function deposit() {
+    const user = document.getElementById('username').value;
+    const amount = parseFloat(document.getElementById('amount').value);
+    if(!user || amount <= 0) return alert("Enter valid username and amount");
+    let u = getUserData(user);
+    u.balance += amount;
+    saveUserData(user, u);
+    updateBalance(u.balance);
+}
+
+function withdraw() {
+    const user = document.getElementById('username').value;
+    const amount = parseFloat(document.getElementById('amount').value);
+    let u = getUserData(user);
+    if(!user || amount <= 0 || u.balance < amount) return alert("Insufficient balance");
+    u.balance -= amount;
+    saveUserData(user, u);
+    updateBalance(u.balance);
+}
+
+function predict() {
+    const user = document.getElementById('username').value;
+    if(!user) return alert("Enter your name");
+    const colors = ["Red","Blue","Green","Yellow","Orange","Purple","Pink","Brown","Black","White"];
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    let u = getUserData(user);
+    u.history.push({ color, date: new Date().toISOString() });
+    saveUserData(user, u);
+
+    document.getElementById('colorBox').style.backgroundColor = color.toLowerCase();
+    document.getElementById('colorBox').innerText = color;
+    updateBalance(u.balance);
+    renderHistory(u.history);
+}
+
+function updateBalance(bal) {
+    document.getElementById('balance').innerText = "Balance: " + bal;
+}
+
+function renderHistory(history) {
+    const historyDiv = document.getElementById('history');
+    historyDiv.innerHTML = "<h3>History</h3>";
+    history.forEach(h => {
+        historyDiv.innerHTML += `<div>${h.color} - ${new Date(h.date).toLocaleString()}</div>`;
+    });
+}
+</script>
 
 </body>
 </html>
+
