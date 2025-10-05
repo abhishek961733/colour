@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Prediction</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f5f5f5;
+            padding: 50px;
+        }
+        h1 {
+            color: #333;
+        }
+        #colorBox {
+            width: 200px;
+            height: 200px;
+            margin: 20px auto;
+            border: 2px solid #333;
+            border-radius: 10px;
+            background-color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: #333;
+            color: #fff;
+        }
+        button:hover {
+            background-color: #555;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Color Prediction</h1>
+    <div id="colorBox">Click Predict</div>
+    <button onclick="predictColor()">Predict Color</button>
+
+    <script>
+        const colors = [
+            "Red", "Blue", "Green", "Yellow", "Orange", 
+            "Purple", "Pink", "Brown", "Black", "White"
+        ];
+
+        function predictColor() {
+            const randomIndex = Math.floor(Math.random() * colors.length);
+            const color = colors[randomIndex];
+            const colorBox = document.getElementById("colorBox");
+            colorBox.style.backgroundColor = color.toLowerCase();
+            colorBox.innerText = color;
+        }
+    </script>
+
+</body>
+</html>
